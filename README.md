@@ -2,7 +2,7 @@
 
 **Modern, Fast, and Beautiful.**
 
-本プロジェクトは、**「超高速なC++思考エンジン」**、**「堅牢なRails API」**、そして**「没入感のあるNeumorphism Frontend」**の3層構造で構成されるモダンなWebアプリケーションです。
+本プロジェクトは、**超高速なC++思考エンジン**、**堅牢なRails API**、そして**没入感のあるNeumorphism Frontend**の3層構造で構成されるモダンなWebアプリケーションです。
 
 <p align="center">
   <img src="public/assets/preview.png" alt="UI Preview" width="100%">
