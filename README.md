@@ -5,7 +5,7 @@
 本プロジェクトは、**「超高速なC++思考エンジン」**、**「堅牢なRails API」**、そして**「没入感のあるNeumorphism Frontend」**の3層構造で構成されるモダンなWebアプリケーションです。
 
 <p align="center">
-  <img src="frontend/public/preview.png" alt="UI Preview" width="100%">
+  <img src="public/assets/preview.png" alt="UI Preview" width="100%">
 </p>
 
 ## 🏗 System Overview
