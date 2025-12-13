@@ -16,3 +16,31 @@ Api::V1::GamesControllerTest: test_should_return_error_for_invalid_board_length
 Api::V1::GamesControllerTest: test_should_get_next_move_with_valid_board
 ------------------------------------------------------------------------
   [1m[36mTRANSACTION (0.0ms)[0m  [1m[31mROLLBACK TRANSACTION[0m
+  [1m[36mActiveRecord::SchemaMigration Load (0.1ms)[0m  [1m[34mSELECT "schema_migrations"."version" FROM "schema_migrations" ORDER BY "schema_migrations"."version" ASC[0m
+  [1m[36mTRANSACTION (0.0ms)[0m  [1m[36mBEGIN deferred TRANSACTION[0m
+-------------------------------------------------------------------------------------
+Api::V1::GamesControllerTest: test_should_return_error_when_C++_executable_is_missing
+-------------------------------------------------------------------------------------
+Started POST "/api/v1/games/next_move" for 127.0.0.1 at 2025-12-14 03:19:00 +0900
+Processing by Api::V1::GamesController#next_move as JSON
+  Parameters: {"board" => "2222222222222222222222222222222222222222222222222222222222222222", "turn" => 0, "game" => {"board" => "2222222222222222222222222222222222222222222222222222222222222222", "turn" => 0}}
+Completed 500 Internal Server Error in 4ms (Views: 0.1ms | ActiveRecord: 0.0ms (0 queries, 0 cached) | GC: 0.4ms)
+  [1m[36mTRANSACTION (0.0ms)[0m  [1m[31mROLLBACK TRANSACTION[0m
+  [1m[36mTRANSACTION (0.0ms)[0m  [1m[36mBEGIN deferred TRANSACTION[0m
+-------------------------------------------------------------------------------
+Api::V1::GamesControllerTest: test_should_return_error_for_invalid_board_length
+-------------------------------------------------------------------------------
+Started POST "/api/v1/games/next_move" for 127.0.0.1 at 2025-12-14 03:19:00 +0900
+Processing by Api::V1::GamesController#next_move as JSON
+  Parameters: {"board" => "000", "turn" => 0, "game" => {"board" => "000", "turn" => 0}}
+Completed 422 Unprocessable Content in 0ms (Views: 0.0ms | ActiveRecord: 0.0ms (0 queries, 0 cached) | GC: 0.0ms)
+  [1m[36mTRANSACTION (0.0ms)[0m  [1m[31mROLLBACK TRANSACTION[0m
+  [1m[36mTRANSACTION (0.0ms)[0m  [1m[36mBEGIN deferred TRANSACTION[0m
+------------------------------------------------------------------------
+Api::V1::GamesControllerTest: test_should_get_next_move_with_valid_board
+------------------------------------------------------------------------
+Started POST "/api/v1/games/next_move" for 127.0.0.1 at 2025-12-14 03:19:00 +0900
+Processing by Api::V1::GamesController#next_move as JSON
+  Parameters: {"board" => "2222222222222222222222222221022222201222222222222222222222222222", "turn" => 0, "game" => {"board" => "2222222222222222222222222221022222201222222222222222222222222222", "turn" => 0}}
+Completed 200 OK in 56ms (Views: 0.2ms | ActiveRecord: 0.0ms (0 queries, 0 cached) | GC: 0.0ms)
+  [1m[36mTRANSACTION (0.0ms)[0m  [1m[31mROLLBACK TRANSACTION[0m
