@@ -1,0 +1,51 @@
+---
+openapi: 3.0.1
+info:
+  title: API V1
+  version: v1
+paths:
+  "/api/v1/games/next_move":
+    post:
+      summary: Calculates the next move for the AI
+      tags:
+      - Games
+      parameters: []
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  next_move:
+                    type: integer
+                    example: 19
+                    description: The index of the cell where AI places its stone
+                required:
+                - next_move
+        '422':
+          description: Invalid input
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                board:
+                  type: string
+                  example: '0000000000000000000000000001200000021000000000000000000000000000'
+                  description: '64-character string representing the board (0: empty,
+                    1: black, 2: white)'
+                turn:
+                  type: integer
+                  example: 1
+                  description: 'Current turn (0: black, 1: white)'
+              required:
+              - board
+              - turn
+servers:
+- url: https://{defaultHost}
+  variables:
+    defaultHost:
+      default: www.example.com
