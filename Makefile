@@ -36,7 +36,7 @@ help: ## Display this help message
 	@echo ""
 	@echo "Testing:"
 	@echo "  make test                - Run all tests"
-	@echo "  make test-backend FILES='file1 file2' - Run specific backend test files"
+	@echo "  make test-backend FILES='test/file1.rb test/file2.rb' - Run specific backend test files"
 	@echo "  make test-backend-all    - Run all backend tests (minitest + rspec)"
 	@echo "  make test-backend-rspec  - Run backend RSpec tests"
 	@echo "  make test-frontend       - Run frontend linting"
