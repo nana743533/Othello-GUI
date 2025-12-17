@@ -3,6 +3,8 @@
 
 #include "board.hpp"
 #include "cell_evaluate.hpp"
+// Note: Including ai1.cpp directly is necessary because it's not designed as a library.
+// In production, this should be refactored into proper header/implementation separation.
 #include "ai1.cpp"
 #include <iostream>
 #include <cassert>
@@ -12,11 +14,8 @@
 int test_count = 0;
 int passed_count = 0;
 
-#define TEST(name) \
-    void name(); \
-    void register_##name() __attribute__((constructor)); \
-    void register_##name() { std::cout << "Registered test: " << #name << std::endl; } \
-    void name()
+// Simple test registration without compiler-specific attributes
+#define TEST(name) void name()
 
 #define ASSERT_TRUE(condition) \
     do { \
@@ -299,7 +298,7 @@ int main() {
     std::cout << "  Othello AI Unit Tests" << std::endl;
     std::cout << "========================================" << std::endl;
     
-    // Run all tests
+    // Run all tests (manually registered for portability)
     test_board_initialization();
     test_board_conversion();
     test_initial_position_legal_moves();
