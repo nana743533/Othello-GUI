@@ -1,20 +1,20 @@
-// Unit tests for othello_ai logic
-// This file tests the core functionality of the Othello AI implementation
+// othello_ai ユニットテスト
+// Othello AIの主要機能をテストします
 
 #include "board.hpp"
 #include "cell_evaluate.hpp"
-// Note: Including ai1.cpp directly is necessary because it's not designed as a library.
-// In production, this should be refactored into proper header/implementation separation.
+// 注: ai1.cppを直接インクルードしています。本来はヘッダとして分離すべきですが、
+// 現在の設計ではこの方法が必要です。
 #include "ai1.cpp"
 #include <iostream>
 #include <cassert>
 #include <cstring>
 
-// Simple test framework
+// シンプルなテストフレームワーク
 int test_count = 0;
 int passed_count = 0;
 
-// Simple test registration without compiler-specific attributes
+// テスト登録（コンパイラ依存の属性を使わない移植可能な実装）
 #define TEST(name) void name()
 
 #define ASSERT_TRUE(condition) \
@@ -52,7 +52,7 @@ int passed_count = 0;
         } \
     } while (0)
 
-// Helper function to create a board from a string
+// ヘルパー関数: 文字列から盤面を生成
 board create_board_from_string(const std::string& board_string, int player) {
     int arr[64];
     for (int i = 0; i < hw2; ++i) {
@@ -69,7 +69,7 @@ board create_board_from_string(const std::string& board_string, int player) {
     return b;
 }
 
-// Helper function to count pieces on a board
+// ヘルパー関数: 盤面の石の数を数える
 void count_pieces(const board& b, int& black_count, int& white_count, int& empty_count) {
     int arr[64];
     b.trans_arr(arr);
@@ -83,30 +83,30 @@ void count_pieces(const board& b, int& black_count, int& white_count, int& empty
     }
 }
 
-// Test 1: Board initialization
+// テスト1: 盤面の初期化
 TEST(test_board_initialization) {
-    std::cout << "\n=== Test: Board Initialization ===" << std::endl;
+    std::cout << "\n=== テスト: 盤面の初期化 ===" << std::endl;
     
     init_board();
     evaluate_init();
     
-    // Check that initialization completes without error
+    // 初期化がエラーなく完了することを確認
     ASSERT_TRUE(true);
     
-    // Test that pow3 array is correctly initialized
+    // pow3配列が正しく初期化されていることを確認
     ASSERT_EQ(1, pow3[0]);
     ASSERT_EQ(3, pow3[1]);
     ASSERT_EQ(9, pow3[2]);
     ASSERT_EQ(27, pow3[3]);
 }
 
-// Test 2: Board conversion
+// テスト2: 盤面変換
 TEST(test_board_conversion) {
-    std::cout << "\n=== Test: Board Conversion ===" << std::endl;
+    std::cout << "\n=== テスト: 盤面変換 ===" << std::endl;
     
     init_board();
     
-    // Create a simple board pattern
+    // シンプルな盤面パターンを作成
     int arr[64];
     for (int i = 0; i < hw2; ++i) arr[i] = vacant;
     arr[0] = black;
@@ -115,7 +115,7 @@ TEST(test_board_conversion) {
     board b;
     b.trans_idx(arr);
     
-    // Convert back and verify
+    // 逆変換して検証
     int arr_back[64];
     b.trans_arr(arr_back);
     
@@ -124,18 +124,18 @@ TEST(test_board_conversion) {
     ASSERT_EQ(vacant, arr_back[32]);
 }
 
-// Test 3: Initial position legal moves
+// テスト3: 初期局面の合法手
 TEST(test_initial_position_legal_moves) {
-    std::cout << "\n=== Test: Initial Position Legal Moves ===" << std::endl;
+    std::cout << "\n=== テスト: 初期局面の合法手 ===" << std::endl;
     
     init_board();
     
-    // Standard Othello starting position
-    // Position 27=white, 28=black, 35=black, 36=white
+    // オセロの標準的な開始局面
+    // 位置 27=白, 28=黒, 35=黒, 36=白
     std::string initial = "0000000000000000000000000002100000012000000000000000000000000000";
     board b = create_board_from_string(initial, black);
     
-    // Black should have exactly 4 legal moves in the initial position
+    // 初期局面では黒は正確に4つの合法手を持つ
     int legal_count = 0;
     for (int i = 0; i < hw2; ++i) {
         if (b.legal_place(i)) {
@@ -145,45 +145,45 @@ TEST(test_initial_position_legal_moves) {
     
     ASSERT_EQ(4, legal_count);
     
-    // Specific legal moves for black in initial position
+    // 初期局面での黒の具体的な合法手
     ASSERT_TRUE(b.legal_place(19));  // D3
     ASSERT_TRUE(b.legal_place(26));  // C4
     ASSERT_TRUE(b.legal_place(37));  // F5
     ASSERT_TRUE(b.legal_place(44));  // E6
 }
 
-// Test 4: Move execution
+// テスト4: 着手の実行
 TEST(test_move_execution) {
-    std::cout << "\n=== Test: Move Execution ===" << std::endl;
+    std::cout << "\n=== テスト: 着手の実行 ===" << std::endl;
     
     init_board();
     
     std::string initial = "0000000000000000000000000002100000012000000000000000000000000000";
     board b = create_board_from_string(initial, black);
     
-    // Execute move at position 19 (D3)
+    // 位置19(D3)に着手
     ASSERT_TRUE(b.legal_place(19));
     board b_after = b.move(19);
     
-    // After the move, player should switch
+    // 着手後、手番が交代する
     ASSERT_EQ(white, b_after.player);
     
-    // Verify that the board state changed
+    // 盤面状態が変化したことを確認
     ASSERT_FALSE(b == b_after);
 }
 
-// Test 5: Pass move handling (no legal moves)
+// テスト5: パス局面の処理（合法手なし）
 TEST(test_pass_move_scenario) {
-    std::cout << "\n=== Test: Pass Move Scenario ===" << std::endl;
+    std::cout << "\n=== テスト: パス局面 ===" << std::endl;
     
     init_board();
     
-    // Create a position where one player has no legal moves
-    // This is a contrived example - white pieces surrounded with no legal moves
+    // プレイヤーが合法手を持たない局面を作成
+    // これは人工的な例 - 白石が包囲されて合法手がない
     std::string no_moves = "1111111111111111111111111111111111111121111111111111111111111111";
     board b = create_board_from_string(no_moves, white);
     
-    // White should have no legal moves
+    // 白は合法手を持たないはず
     bool has_legal_move = false;
     for (int i = 0; i < hw2; ++i) {
         if (b.legal_place(i)) {
@@ -195,25 +195,25 @@ TEST(test_pass_move_scenario) {
     ASSERT_FALSE(has_legal_move);
 }
 
-// Test 6: Corner positions
+// テスト6: 角の位置
 TEST(test_corner_positions) {
-    std::cout << "\n=== Test: Corner Positions ===" << std::endl;
+    std::cout << "\n=== テスト: 角の位置 ===" << std::endl;
     
     init_board();
     
     std::string initial = "0000000000000000000000000002100000012000000000000000000000000000";
     board b = create_board_from_string(initial, black);
     
-    // Corners should not be legal in initial position
+    // 初期局面では角は合法手ではない
     ASSERT_FALSE(b.legal_place(0));   // A1
     ASSERT_FALSE(b.legal_place(7));   // H1
     ASSERT_FALSE(b.legal_place(56));  // A8
     ASSERT_FALSE(b.legal_place(63));  // H8
 }
 
-// Test 7: Evaluate function
+// テスト7: 評価関数
 TEST(test_evaluate_function) {
-    std::cout << "\n=== Test: Evaluate Function ===" << std::endl;
+    std::cout << "\n=== テスト: 評価関数 ===" << std::endl;
     
     init_board();
     evaluate_init();
@@ -221,16 +221,16 @@ TEST(test_evaluate_function) {
     std::string initial = "0000000000000000000000000002100000012000000000000000000000000000";
     board b = create_board_from_string(initial, black);
     
-    // Evaluation should return a value
+    // 評価値を計算
     int eval = evaluate(b);
     
-    // In initial position, evaluation should be relatively small (balanced)
+    // 初期局面では評価値は比較的小さい（バランスが取れている）
     ASSERT_TRUE(eval >= -100 && eval <= 100);
 }
 
-// Test 8: AI search returns valid move
+// テスト8: AI探索が有効な手を返す
 TEST(test_ai_search_returns_valid_move) {
-    std::cout << "\n=== Test: AI Search Returns Valid Move ===" << std::endl;
+    std::cout << "\n=== テスト: AI探索 ===" << std::endl;
     
     init_board();
     evaluate_init();
@@ -238,16 +238,16 @@ TEST(test_ai_search_returns_valid_move) {
     std::string initial = "0000000000000000000000000002100000012000000000000000000000000000";
     board b = create_board_from_string(initial, black);
     
-    // Search should return a valid move (not -1)
-    int move = search(b, 3, 1);  // Shallow search for speed
+    // 探索は有効な手を返すはず（-1ではない）
+    int move = search(b, 3, 1);  // 速度のため浅い探索
     
     ASSERT_TRUE(move >= 0 && move < hw2);
     ASSERT_TRUE(b.legal_place(move));
 }
 
-// Test 9: Board equality operator
+// テスト9: 盤面の等価性演算子
 TEST(test_board_equality) {
-    std::cout << "\n=== Test: Board Equality ===" << std::endl;
+    std::cout << "\n=== テスト: 盤面の等価性 ===" << std::endl;
     
     init_board();
     
@@ -257,26 +257,26 @@ TEST(test_board_equality) {
     
     ASSERT_TRUE(b1 == b2);
     
-    // Different player should not be equal
+    // 手番が異なる場合は等しくない
     board b3 = create_board_from_string(board_str, white);
     ASSERT_FALSE(b1 == b3);
 }
 
-// Test 10: Multiple moves sequence
+// テスト10: 連続着手のシーケンス
 TEST(test_move_sequence) {
-    std::cout << "\n=== Test: Move Sequence ===" << std::endl;
+    std::cout << "\n=== テスト: 連続着手 ===" << std::endl;
     
     init_board();
     
     std::string initial = "0000000000000000000000000002100000012000000000000000000000000000";
     board b = create_board_from_string(initial, black);
     
-    // Make a sequence of moves
+    // 連続して着手
     ASSERT_TRUE(b.legal_place(19));
     board b1 = b.move(19);
     ASSERT_EQ(white, b1.player);
     
-    // Find a legal move for white
+    // 白の合法手を探す
     bool found_legal = false;
     int white_move = -1;
     for (int i = 0; i < hw2; ++i) {
@@ -295,10 +295,10 @@ TEST(test_move_sequence) {
 
 int main() {
     std::cout << "========================================" << std::endl;
-    std::cout << "  Othello AI Unit Tests" << std::endl;
+    std::cout << "  Othello AI ユニットテスト" << std::endl;
     std::cout << "========================================" << std::endl;
     
-    // Run all tests (manually registered for portability)
+    // 全テストを実行（移植性のため手動登録）
     test_board_initialization();
     test_board_conversion();
     test_initial_position_legal_moves();
@@ -310,19 +310,19 @@ int main() {
     test_board_equality();
     test_move_sequence();
     
-    // Print summary
+    // サマリー出力
     std::cout << "\n========================================" << std::endl;
-    std::cout << "  Test Results" << std::endl;
+    std::cout << "  テスト結果" << std::endl;
     std::cout << "========================================" << std::endl;
-    std::cout << "Total tests: " << test_count << std::endl;
-    std::cout << "Passed: " << passed_count << std::endl;
-    std::cout << "Failed: " << (test_count - passed_count) << std::endl;
+    std::cout << "合計: " << test_count << std::endl;
+    std::cout << "成功: " << passed_count << std::endl;
+    std::cout << "失敗: " << (test_count - passed_count) << std::endl;
     
     if (test_count == passed_count) {
-        std::cout << "\n✓ All tests passed!" << std::endl;
+        std::cout << "\n✓ 全てのテストが成功しました！" << std::endl;
         return 0;
     } else {
-        std::cout << "\n✗ Some tests failed!" << std::endl;
+        std::cout << "\n✗ 失敗したテストがあります！" << std::endl;
         return 1;
     }
 }

@@ -5,17 +5,17 @@
 using namespace std;
 
 // 盤面サイズ
-#define hw 8        // 縦横のマス数
-#define hw2 64      // 全マス数
+#define hw 8        // 縦横のマス数（8x8）
+#define hw2 64      // 全マス数（8*8）
 
-// 盤面表現
-#define n_board_idx 38  // ライン数
-#define n_line 6561     // ラインパターン数 (3^8)
+// 盤面表現の定数
+#define n_board_idx 38  // ライン数（横8 + 縦8 + 斜め11 + 斜め11）
+#define n_line 6561     // ラインパターン数（3^8 = 各マスが空き/黒/白の3通り）
 
-// セル状態
-#define vacant 0
-#define black 1
-#define white 2
+// セル状態の定義
+#define vacant 0  // 空きマス
+#define black 1   // 黒石
+#define white 2   // 白石
 
 const int global_place[n_board_idx][hw]{
     {0, 1, 2, 3, 4, 5, 6, 7},         {8, 9, 10, 11, 12, 13, 14, 15},
@@ -205,7 +205,7 @@ public:
   bool operator==(const board &another) const {
     if (this->player != another.player)
       return false;
-    // 全要素を比較
+    // 全ライン要素を比較して等価性を判定
     for (int i = 0; i < n_board_idx; ++i) {
       if (this->board_idx[i] != another.board_idx[i])
         return false;

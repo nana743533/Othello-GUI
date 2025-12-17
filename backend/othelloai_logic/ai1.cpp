@@ -10,10 +10,12 @@
 #define bonus 100
 
 // 置換表（探索の高速化用）
+// 評価済みの局面をキャッシュして、重複計算を避ける
 unordered_map<board, int, board::hash> transpose_table;
 unordered_map<board, int, board::hash> former_transpose_table;
 
-// ムーブオーダリング用評価値
+// ムーブオーダリング用の評価値を算出
+// 前回の探索結果を利用して、有望な手を優先的に探索する
 int moveordering_evaluate(const board &b) {
   auto it = former_transpose_table.find(b);
   if (it != former_transpose_table.end()) {
@@ -22,7 +24,8 @@ int moveordering_evaluate(const board &b) {
   return -evaluate(b);
 }
 
-// ネガアルファ法
+// ネガアルファ法による再帰探索
+// アルファベータ枝刈りを用いて探索空間を削減し、効率的に最善手を見つける
 int nega_alpha(board b, int depth, bool passed, int alpha, int beta) {
   auto it = transpose_table.find(b);
   if (it != transpose_table.end())
@@ -63,6 +66,8 @@ int nega_alpha(board b, int depth, bool passed, int alpha, int beta) {
 }
 
 // 反復深化探索
+// 浅い探索から徐々に深くし、前回の結果を次の探索に活用してムーブオーダリングを改善
+// 最終的にdepth手先まで読み、最善手のインデックス(0-63)を返す。合法手がない場合は-1
 int search(board b, int depth, int offset) {
   int start = std::max(1, depth - offset);
   int res = -1;
