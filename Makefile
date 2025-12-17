@@ -38,7 +38,7 @@ help: ## Display this help message
 	@echo "Testing:"
 	@echo "  make test                - Run all tests"
 	@echo "  make test-backend        - Run backend tests (minitest)"
-	@echo "  make test-backend-all    - Run all backend tests"
+	@echo "  make test-backend-all    - Run all backend tests (minitest + rspec)"
 	@echo "  make test-backend-rspec  - Run backend RSpec tests"
 	@echo "  make test-frontend       - Run frontend linting"
 	@echo ""
@@ -124,6 +124,7 @@ test-backend:
 
 test-backend-all:
 	docker compose exec backend bin/rails test
+	docker compose exec backend bundle exec rspec
 
 test-backend-rspec:
 	docker compose exec backend bundle exec rspec
