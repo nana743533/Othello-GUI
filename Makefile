@@ -1,8 +1,7 @@
 .PHONY: help up down build logs shell-backend shell-frontend restart clean \
         install setup compile-cpp \
         test test-backend test-backend-all test-backend-rspec \
-        lint lint-backend lint-frontend lint-backend-fix \
-        rebuild
+        lint lint-backend lint-frontend lint-backend-fix
 
 .DEFAULT_GOAL := help
 
@@ -18,7 +17,6 @@ help: ## Display this help message
 	@echo "  make up-d                - Start all services in detached mode"
 	@echo "  make down                - Stop all services"
 	@echo "  make build               - Build all Docker images"
-	@echo "  make rebuild             - Rebuild all Docker images without cache"
 	@echo "  make restart             - Restart all services"
 	@echo "  make clean               - Stop all services and remove volumes"
 	@echo "  make logs                - Show logs from all services"
@@ -62,9 +60,6 @@ down:
 
 build:
 	docker compose build
-
-rebuild:
-	docker compose build --no-cache
 
 logs:
 	docker compose logs -f
