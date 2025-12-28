@@ -113,10 +113,18 @@ function GameContent() {
             {statusDisplay}
           </div>
 
+          {/* Reset Button */}
+          <button
+            onClick={resetGame}
+            className="w-full py-2 font-bold text-lg rounded-xl text-neumorphism-text bg-neumorphism-base shadow-neumorphism-flat hover:shadow-neumorphism-pressed active:translate-y-0.5 transition-all duration-200"
+          >
+            Reset
+          </button>
+
           {/* New Game Button */}
           <button
             onClick={handleNewGame}
-            className="w-full py-3 font-bold text-lg rounded-xl text-neumorphism-text bg-neumorphism-base shadow-neumorphism-flat hover:shadow-neumorphism-pressed active:translate-y-0.5 transition-all duration-200"
+            className="w-full py-2 font-bold text-lg rounded-xl text-neumorphism-text bg-neumorphism-base shadow-neumorphism-flat hover:shadow-neumorphism-pressed active:translate-y-0.5 transition-all duration-200"
           >
             New Game
           </button>
