@@ -13,7 +13,7 @@ export const Cell: React.FC<CellProps> = ({ value, onClick, disabled }) => {
     <div
       onClick={!disabled ? onClick : undefined}
       className={`
-        w-10 h-10 sm:w-12 sm:h-12 md:w-16 md:h-16 lg:w-20 lg:h-20
+        w-full aspect-square
         rounded-lg
         flex items-center justify-center
         transition-all duration-200 ease-in-out
