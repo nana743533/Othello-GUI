@@ -12,16 +12,28 @@ interface ResultPopupProps {
 export const ResultPopup: React.FC<ResultPopupProps> = ({ winner, board, onRestart }) => {
   if (winner === null) return null;
 
-  const blackCount = board.filter((c) => c === 0).length;
-  const whiteCount = board.filter((c) => c === 1).length;
+  const rawBlackCount = board.filter((c) => c === 0).length;
+  const rawWhiteCount = board.filter((c) => c === 1).length;
+  const emptyCount = board.filter((c) => c === -1).length;
 
+  let finalBlackCount = rawBlackCount;
+  let finalWhiteCount = rawWhiteCount;
   let resultMessage = '';
+
   if (winner === 'Draw') {
     resultMessage = 'Draw!';
+    // Split empty cells
+    const split = Math.floor(emptyCount / 2); // Should be even if board is even, but safety floor
+    finalBlackCount += split;
+    finalWhiteCount += split;
+    // If emptyCount is odd (shouldn't be on 8x8 normally if full game, but theoretically possible if early end?), 
+    // actually Othello board 64 is even. 
   } else if (winner === 0) {
-    resultMessage = 'Black Wins!';
+    resultMessage = 'You Win!';
+    finalBlackCount += emptyCount;
   } else {
-    resultMessage = 'White Wins!';
+    resultMessage = 'AI Win!';
+    finalWhiteCount += emptyCount;
   }
 
   return (
@@ -29,29 +41,30 @@ export const ResultPopup: React.FC<ResultPopupProps> = ({ winner, board, onResta
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm animate-in fade-in duration-300"
     >
       <div
-        className="p-10 rounded-3xl bg-neumorphism-base shadow-2xl flex flex-col items-center gap-6 transform scale-100 animate-in zoom-in duration-300"
+        className="p-12 rounded-3xl bg-neumorphism-base shadow-2xl flex flex-col items-center gap-8 transform scale-100 animate-in zoom-in duration-300"
         onClick={(e) => e.stopPropagation()}
       >
-        <h2 className="text-4xl font-bold text-neumorphism-text mb-2">Game Over</h2>
-
-        <div className="text-3xl font-extrabold text-neumorphism-accent">
+        <h2 className="text-5xl font-extrabold text-neumorphism-accent mb-2 tracking-wide">
           {resultMessage}
-        </div>
+        </h2>
 
-        <div className="flex gap-12 text-xl font-bold text-neumorphism-text my-4">
-          <div className="flex flex-col items-center gap-2">
-            <div className="w-12 h-12 rounded-full bg-gray-800 shadow-md border-2 border-gray-700"></div>
-            <span>{blackCount}</span>
+        <div className="flex items-center gap-8 text-neumorphism-text">
+          <div className="flex flex-col items-center gap-3">
+            <div className="w-16 h-16 rounded-full bg-gray-900 shadow-lg border-2 border-gray-700"></div>
+            <span className="text-5xl font-bold">{finalBlackCount}</span>
           </div>
-          <div className="flex flex-col items-center gap-2">
-            <div className="w-12 h-12 rounded-full bg-gray-100 shadow-md border-2 border-white"></div>
-            <span>{whiteCount}</span>
+
+          <div className="text-5xl font-light text-gray-400 opacity-50 px-2">-</div>
+
+          <div className="flex flex-col items-center gap-3">
+            <div className="w-16 h-16 rounded-full bg-gray-100 shadow-lg border-2 border-white"></div>
+            <span className="text-5xl font-bold">{finalWhiteCount}</span>
           </div>
         </div>
 
         <button
           onClick={onRestart}
-          className="px-8 py-4 text-lg font-bold rounded-xl text-white bg-blue-500 shadow-lg hover:bg-blue-600 hover:shadow-xl active:scale-95 transition-all duration-200"
+          className="mt-4 px-10 py-4 text-xl font-bold rounded-2xl text-white bg-blue-500 shadow-lg hover:bg-blue-600 hover:shadow-xl active:scale-95 transition-all duration-200"
         >
           New Game
         </button>
