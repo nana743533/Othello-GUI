@@ -2,6 +2,7 @@
 
 import { Board } from '@/components/Board';
 import { PassPopup } from '@/components/PassPopup';
+import { ResultPopup } from '@/components/ResultPopup';
 import { useOthello } from '@/hooks/useOthello';
 
 export default function Home() {
@@ -57,6 +58,9 @@ export default function Home() {
       {passPopup && (
         <PassPopup passType={passPopup} onAcknowledge={acknowledgePass} />
       )}
+
+      {/* Result Popup */}
+      <ResultPopup winner={winner} board={board} onRestart={resetGame} />
     </div>
   );
 }
