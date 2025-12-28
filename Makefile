@@ -11,7 +11,7 @@
 
 help: ## Display this help message
 	@echo "Available commands:"
-	@echo ""
+	@echo "  make ci                  - Run all tests and linting"
 	@echo "Docker Commands:"
 	@echo "  make up                  - Start all services"
 	@echo "  make up-d                - Start all services in detached mode"
@@ -37,7 +37,7 @@ help: ## Display this help message
 	@echo "  make test-backend FILES='test/file1.rb test/file2.rb' - Run specific backend test files"
 	@echo "  make test-backend-all    - Run all backend tests (minitest + rspec)"
 	@echo "  make test-backend-rspec  - Run backend RSpec tests"
-	@echo "  make test-frontend       - Run frontend linting"
+	@echo "  make test-frontend       - Run frontend unit tests (Jest)"
 	@echo ""
 	@echo "Linting:"
 	@echo "  make lint                - Lint all code"
@@ -114,7 +114,7 @@ test-backend-rspec:
 	docker compose exec backend bundle exec rspec
 
 test-frontend:
-	docker compose exec frontend npm run lint
+	docker compose exec frontend npm test
 
 # ============================================================================
 # Linting Commands
@@ -130,3 +130,9 @@ lint-backend-fix:
 
 lint-frontend:
 	docker compose exec frontend npm run lint
+
+# ============================================================================
+# CI Commands
+# ============================================================================
+
+ci: lint test
