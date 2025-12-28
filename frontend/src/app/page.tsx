@@ -20,9 +20,24 @@ export default function Home() {
   const blackCount = board.filter((c) => c === 0).length;
   const whiteCount = board.filter((c) => c === 1).length;
 
-  const statusText = winner === null
-    ? `Turn: ${turn === 0 ? 'Black' : 'White'}`
-    : `Winner: ${winner === 'Draw' ? 'Draw' : winner === 0 ? 'Black' : 'White'}`;
+  // Determine status text & style
+  let statusDisplay = '';
+  let statusColor = 'text-neumorphism-text';
+
+  if (winner !== null) {
+    if (winner === 'Draw') statusDisplay = 'Draw';
+    else if (winner === 0) statusDisplay = 'You Win!';
+    else statusDisplay = 'AI Wins!';
+  } else {
+    // If not game over
+    if (turn === 0) {
+      statusDisplay = 'Your Turn';
+    } else {
+      // AI Turn (Always show AI Thinking)
+      statusDisplay = 'AI Thinking...';
+      statusColor = 'text-neumorphism-accent';
+    }
+  }
 
   return (
     <div className="flex flex-col lg:flex-row items-center justify-center min-h-screen gap-8 lg:gap-16 p-4 bg-neumorphism-base">
@@ -32,18 +47,20 @@ export default function Home() {
 
         {/* Score Panel */}
         <div className="flex flex-row items-center justify-center gap-8 p-5 rounded-2xl bg-neumorphism-base shadow-neumorphism-flat">
-          {/* Black Score */}
-          <div className="flex flex-col items-center gap-2">
+          {/* Black Score (You) */}
+          <div className="flex flex-col items-center gap-3">
             <div className="w-10 h-10 rounded-full bg-gray-800 border-2 border-gray-700 shadow-md"></div>
-            <span className="text-2xl font-bold text-neumorphism-text">{blackCount}</span>
+            <span className="text-3xl font-bold text-neumorphism-text">{blackCount}</span>
+            <span className="text-lg font-bold text-neumorphism-text mt-1">You</span>
           </div>
 
-          <div className="text-2xl font-bold text-gray-400 opacity-50">-</div>
+          <div className="text-2xl font-bold text-gray-400 opacity-50 pb-8">-</div>
 
-          {/* White Score */}
-          <div className="flex flex-col items-center gap-2">
+          {/* White Score (AI) */}
+          <div className="flex flex-col items-center gap-3">
             <div className="w-10 h-10 rounded-full bg-gray-100 border-2 border-white shadow-md"></div>
-            <span className="text-2xl font-bold text-neumorphism-text">{whiteCount}</span>
+            <span className="text-3xl font-bold text-neumorphism-text">{whiteCount}</span>
+            <span className="text-lg font-bold text-neumorphism-text mt-1">AI</span>
           </div>
         </div>
 
@@ -51,14 +68,11 @@ export default function Home() {
         <div className="flex flex-col items-center justify-center p-5 gap-4 rounded-2xl bg-neumorphism-base shadow-neumorphism-flat">
 
           {/* Status Section */}
-          <div className="text-xl font-bold text-neumorphism-text text-center break-words w-full">
-            {statusText}
+          <div className={`text-xl font-bold text-center break-words w-full min-h-[1.75rem] ${statusColor}`}>
+            {statusDisplay}
           </div>
 
-          {/* AI Thinking Indicator */}
-          <div className={`text-sm font-bold text-neumorphism-accent transition-opacity duration-300 ${isProcessing ? 'opacity-100' : 'opacity-0'}`}>
-            {isProcessing ? "AI Thinking..." : " "}
-          </div>
+          {/* AI Thinking Indicator removed */}
 
           {/* New Game Button */}
           <button
