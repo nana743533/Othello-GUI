@@ -1,10 +1,20 @@
 'use client';
 
 import { Board } from '@/components/Board';
+import { PassPopup } from '@/components/PassPopup';
 import { useOthello } from '@/hooks/useOthello';
 
 export default function Home() {
-  const { board, turn, isProcessing, winner, executeMove, resetGame } = useOthello();
+  const {
+    board,
+    turn,
+    isProcessing,
+    winner,
+    passPopup,
+    acknowledgePass,
+    executeMove,
+    resetGame
+  } = useOthello();
 
   const statusText = winner === null
     ? `Turn: ${turn === 0 ? 'Black' : 'White'}`
@@ -42,6 +52,11 @@ export default function Home() {
           New Game
         </button>
       </div>
+
+      {/* Pass Check Popup */}
+      {passPopup && (
+        <PassPopup passType={passPopup} onAcknowledge={acknowledgePass} />
+      )}
     </div>
   );
 }
