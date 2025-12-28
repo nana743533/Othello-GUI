@@ -7,9 +7,10 @@ interface ResultPopupProps {
   winner: Winner;
   board: number[];
   onRestart: () => void;
+  onClose: () => void;
 }
 
-export const ResultPopup: React.FC<ResultPopupProps & { playerColor?: Turn }> = ({ winner, board, onRestart, playerColor = 0 }) => {
+export const ResultPopup: React.FC<ResultPopupProps & { playerColor?: Turn }> = ({ winner, board, onRestart, onClose, playerColor = 0 }) => {
   if (winner === null) return null;
 
   const rawBlackCount = board.filter((c) => c === 0).length;
@@ -62,12 +63,21 @@ export const ResultPopup: React.FC<ResultPopupProps & { playerColor?: Turn }> = 
           </div>
         </div>
 
-        <button
-          onClick={onRestart}
-          className="mt-4 px-10 py-4 text-xl font-bold rounded-2xl text-white bg-blue-500 shadow-lg hover:bg-blue-600 hover:shadow-xl active:scale-95 transition-all duration-200"
-        >
-          New Game
-        </button>
+        <div className="flex flex-row gap-4 mt-4">
+          <button
+            onClick={onClose}
+            className="px-8 py-3 text-lg font-bold rounded-2xl text-neumorphism-text bg-neumorphism-base shadow-neumorphism-flat hover:shadow-neumorphism-pressed active:scale-95 transition-all duration-200"
+          >
+            Close
+          </button>
+
+          <button
+            onClick={onRestart}
+            className="px-10 py-3 text-lg font-bold rounded-2xl text-white bg-blue-500 shadow-lg hover:bg-blue-600 hover:shadow-xl active:scale-95 transition-all duration-200"
+          >
+            New Game
+          </button>
+        </div>
       </div>
     </div>
   );

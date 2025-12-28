@@ -1,7 +1,7 @@
 'use client';
 
 import { useRouter, useSearchParams } from 'next/navigation';
-import { useEffect, Suspense } from 'react';
+import { useEffect, Suspense, useState } from 'react';
 
 import { Board } from '@/components/Board';
 import { PassPopup } from '@/components/PassPopup';
@@ -33,6 +33,8 @@ function GameContent() {
   const playerColor = playerParam === 'white' ? 1 : 0;
   const aiColor = playerColor === 0 ? 1 : 0;
 
+  const [showResult, setShowResult] = useState(false);
+
   const {
     board,
     turn,
@@ -52,6 +54,13 @@ function GameContent() {
   const handleNewGame = () => {
     router.push('/newgame');
   };
+
+  // Show result popup when winner is decided
+  useEffect(() => {
+    if (winner !== null) {
+      setShowResult(true);
+    }
+  }, [winner]);
 
   // Determine status text & style
   let statusDisplay = '';
@@ -155,7 +164,15 @@ function GameContent() {
       )}
 
       {/* Result Popup */}
-      <ResultPopup winner={winner} board={board} onRestart={handleNewGame} playerColor={playerColor} />
+      {showResult && (
+        <ResultPopup
+          winner={winner}
+          board={board}
+          onRestart={handleNewGame}
+          onClose={() => setShowResult(false)}
+          playerColor={playerColor}
+        />
+      )}
     </div>
   );
 }
