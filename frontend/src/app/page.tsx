@@ -67,7 +67,7 @@ function GameContent() {
   let statusColor = 'text-neumorphism-text';
 
   if (winner !== null) {
-    if (winner === 'Draw') statusDisplay = '引き分け';
+    if (winner === 'Draw') statusDisplay = '引き分け！';
     else if (winner === playerColor) statusDisplay = 'あなたの勝ち！';
     else statusDisplay = 'AIの勝ち！';
   } else {
