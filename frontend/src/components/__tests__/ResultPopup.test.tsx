@@ -14,7 +14,7 @@ describe('ResultPopup Component', () => {
 
   it('renders nothing when winner is null', () => {
     const { container } = render(
-      <ResultPopup winner={null} board={mockBoard} onRestart={() => { }} />
+      <ResultPopup winner={null} board={mockBoard} onRestart={() => { }} onClose={() => { }} />
     );
     expect(container).toBeEmptyDOMElement();
   });
@@ -22,7 +22,7 @@ describe('ResultPopup Component', () => {
   it('renders "You Win!" and adds empty cells to Black score when Black wins', () => {
     // Winner 0 = Black (User)
     render(
-      <ResultPopup winner={0} board={mockBoard} onRestart={() => { }} />
+      <ResultPopup winner={0} board={mockBoard} onRestart={() => { }} onClose={() => { }} />
     );
 
     // Message
@@ -35,14 +35,14 @@ describe('ResultPopup Component', () => {
     expect(screen.getByText('1')).toBeInTheDocument();  // White Score
   });
 
-  it('renders "AI Win!" and adds empty cells to White score when White wins', () => {
+  it('renders "AI Wins!" and adds empty cells to White score when White wins', () => {
     // Winner 1 = White (AI)
     render(
-      <ResultPopup winner={1} board={mockBoard} onRestart={() => { }} />
+      <ResultPopup winner={1} board={mockBoard} onRestart={() => { }} onClose={() => { }} />
     );
 
     // Message
-    expect(screen.getByText('AI Win!')).toBeInTheDocument();
+    expect(screen.getByText('AI Wins!')).toBeInTheDocument();
 
     // Score Calculation
     // Black: 3 (raw)
@@ -54,7 +54,7 @@ describe('ResultPopup Component', () => {
   it('renders "Draw!" and splits empty cells when Draw', () => {
     // Winner 'Draw'
     render(
-      <ResultPopup winner="Draw" board={mockBoard} onRestart={() => { }} />
+      <ResultPopup winner="Draw" board={mockBoard} onRestart={() => { }} onClose={() => { }} />
     );
 
     // Message
@@ -71,7 +71,7 @@ describe('ResultPopup Component', () => {
   it('calls onRestart when New Game button is clicked', () => {
     const mockRestart = jest.fn();
     render(
-      <ResultPopup winner={0} board={mockBoard} onRestart={mockRestart} />
+      <ResultPopup winner={0} board={mockBoard} onRestart={mockRestart} onClose={() => { }} />
     );
 
     const button = screen.getByRole('button', { name: 'New Game' });

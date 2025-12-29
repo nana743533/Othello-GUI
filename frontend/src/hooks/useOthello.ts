@@ -6,7 +6,12 @@ type CellValue = -1 | 0 | 1;
 // 0: Black (First), 1: White
 type Turn = 0 | 1;
 
-export const useOthello = () => {
+// Storage Key
+const STORAGE_KEY = 'othello_game_state';
+
+export const useOthello = (playerColor: Turn = 0) => {
+  const aiColor = (playerColor === 0 ? 1 : 0) as Turn;
+
   // Initial Board Setup: center 4 stones
   const initialBoard = Array(64).fill(-1);
   initialBoard[27] = 1;
@@ -14,13 +19,42 @@ export const useOthello = () => {
   initialBoard[35] = 0;
   initialBoard[36] = 1;
 
+  // Initialize state functions
   const [board, setBoard] = useState<CellValue[]>(initialBoard);
-  const [turn, setTurn] = useState<Turn>(0); // Black starts
+  const [turn, setTurn] = useState<Turn>(0);
   const [isProcessing, setIsProcessing] = useState(false);
   const [winner, setWinner] = useState<Turn | 'Draw' | null>(null);
-
-  // Pass Popup State: 'AI' means AI passed, 'USER' means User passed
   const [passPopup, setPassPopup] = useState<'AI' | 'USER' | null>(null);
+  const [isStateLoaded, setIsStateLoaded] = useState(false);
+
+  // Load state from local storage on mount
+  useEffect(() => {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        if (parsed.board && typeof parsed.turn === 'number') {
+          setBoard(parsed.board);
+          setTurn(parsed.turn as Turn);
+          setWinner(parsed.winner);
+          setIsProcessing(false); // Always reset processing on reload to prevent stuck state
+        }
+      } catch (e) {
+        console.error("Failed to load game state", e);
+      }
+    }
+    setIsStateLoaded(true);
+  }, []);
+
+  // Save state to local storage whenever critical state changes
+  useEffect(() => {
+    const stateToSave = {
+      board,
+      turn,
+      winner
+    };
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(stateToSave));
+  }, [board, turn, winner]);
 
   const checkGameEnd = useCallback((currentBoard: CellValue[]) => {
     const blackCanMove = hasValidMoves(currentBoard, 0);
@@ -39,8 +73,8 @@ export const useOthello = () => {
 
   const executeMove = useCallback((index: number) => {
     // 1. Validation & Flipping (Client Side)
-    // Only allow move if it's Player's turn (0) and not processing
-    if (turn !== 0 || isProcessing || winner !== null) return;
+    // Only allow move if it's Player's turn and not processing
+    if (turn !== playerColor || isProcessing || winner !== null) return;
 
     const flippedIndices = getFlippedIndices(board, index, turn);
     if (flippedIndices.length === 0) return;
@@ -53,12 +87,12 @@ export const useOthello = () => {
     });
     setBoard(newBoard);
 
-    const nextTurn = 1; // Always AI next after user move
+    const nextTurn = aiColor; // Always AI next after user move
     setTurn(nextTurn);
 
     // Check game end immediately after move
     checkGameEnd(newBoard);
-  }, [board, turn, isProcessing, winner, checkGameEnd]);
+  }, [board, turn, isProcessing, winner, checkGameEnd, playerColor, aiColor]);
 
 
   // AI Turn Logic
@@ -66,23 +100,23 @@ export const useOthello = () => {
     setIsProcessing(true);
     try {
       const boardString = boardToString(board);
-      const aiMoveIndex = await gameApi.fetchNextMove(boardString, 1); // AI is White (1)
+      const aiMoveIndex = await gameApi.fetchNextMove(boardString, aiColor); // Dynamic AI color
 
       if (aiMoveIndex === -1) {
         // AI Pass
         setPassPopup('AI');
-        setTurn(0); // Return turn to player
+        setTurn(playerColor); // Return turn to player
       } else {
         // AI Move
-        const aiFlipped = getFlippedIndices(board, aiMoveIndex, 1);
+        const aiFlipped = getFlippedIndices(board, aiMoveIndex, aiColor);
         if (aiFlipped.length > 0 || board[aiMoveIndex] === -1) {
           const newBoard = [...board];
-          newBoard[aiMoveIndex] = 1;
+          newBoard[aiMoveIndex] = aiColor;
           aiFlipped.forEach(idx => {
-            newBoard[idx] = 1;
+            newBoard[idx] = aiColor;
           });
           setBoard(newBoard);
-          setTurn(0);
+          setTurn(playerColor);
           checkGameEnd(newBoard);
         } else {
           console.error("AI attempted invalid move:", aiMoveIndex);
@@ -96,12 +130,12 @@ export const useOthello = () => {
     } finally {
       setIsProcessing(false);
     }
-  }, [board, checkGameEnd]);
+  }, [board, checkGameEnd, aiColor, playerColor]);
 
   // Check for pass conditions (User only, AI pass is handled in runAiTurn)
   const checkPassCondition = useCallback(() => {
-    // User Turn (0)
-    const userCanMove = hasValidMoves(board, 0);
+    // User Turn
+    const userCanMove = hasValidMoves(board, playerColor);
 
     // If user has no moves, show pass popup
     if (!userCanMove) {
@@ -110,38 +144,38 @@ export const useOthello = () => {
         setPassPopup('USER');
       }
     }
-  }, [board, checkGameEnd]);
+  }, [board, checkGameEnd, playerColor]);
 
   // Effect to trigger AI Turn or Check User Pass
   useEffect(() => {
     if (winner !== null || passPopup) return;
 
 
-    if (turn === 1) {
+    if (turn === aiColor) {
       // AI Turn
       const timer = setTimeout(() => {
         runAiTurn();
       }, 500);
       return () => clearTimeout(timer);
     } else {
-      // User Turn (0)
+      // User Turn
       checkPassCondition();
     }
-  }, [turn, winner, runAiTurn, checkPassCondition, passPopup]);
+  }, [turn, winner, runAiTurn, checkPassCondition, passPopup, aiColor]);
 
 
   // Function to acknowledge pass popup
   const acknowledgePass = useCallback(() => {
     if (passPopup === 'AI') {
-      // AI passed, control returned to User (turn is already 0 set in runAiTurn)
+      // AI passed, control returned to User (turn is already playerColor set in runAiTurn)
       // Nothing to do but close popup
       setPassPopup(null);
     } else if (passPopup === 'USER') {
       // User passed. Control goes to AI.
       setPassPopup(null);
-      setTurn(1);
+      setTurn(aiColor);
     }
-  }, [passPopup]);
+  }, [passPopup, aiColor]);
 
 
   return {
@@ -149,14 +183,16 @@ export const useOthello = () => {
     turn,
     isProcessing,
     winner,
-    passPopup, // Export this
-    acknowledgePass, // Export this
+    passPopup,
+    acknowledgePass,
     executeMove,
+    isStateLoaded, // Export this
     resetGame: () => {
       setBoard(initialBoard);
       setTurn(0);
       setWinner(null);
       setPassPopup(null);
+      localStorage.removeItem(STORAGE_KEY); // Clear storage on reset
     }
   };
 };

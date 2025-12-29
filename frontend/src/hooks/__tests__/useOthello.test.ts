@@ -26,16 +26,54 @@ describe('useOthello Hook', () => {
     (gameApi.fetchNextMove as jest.Mock).mockResolvedValue(10); // Default AI move
   });
 
-  it('initializes with correct default state', () => {
+  // Mock LocalStorage
+  const localStorageMock = (() => {
+    let store: Record<string, string> = {};
+    return {
+      getItem: jest.fn((key: string) => store[key] || null),
+      setItem: jest.fn((key: string, value: string) => {
+        store[key] = value.toString();
+      }),
+      removeItem: jest.fn((key: string) => {
+        delete store[key];
+      }),
+      clear: jest.fn(() => {
+        store = {};
+      }),
+    };
+  })();
+
+  Object.defineProperty(window, 'localStorage', {
+    value: localStorageMock,
+  });
+
+  it('initializes with correct default state and loads loaded flag', () => {
     const { result } = renderHook(() => useOthello());
 
     expect(result.current.turn).toBe(0);
     expect(result.current.winner).toBeNull();
     expect(result.current.passPopup).toBeNull();
+    expect(result.current.isStateLoaded).toBe(true);
+  });
+
+  it('restores state from localStorage', () => {
+    const savedState = {
+      board: Array(64).fill(0), // All black for simplicity
+      turn: 1,
+      winner: null
+    };
+    localStorageMock.getItem.mockReturnValue(JSON.stringify(savedState));
+
+    const { result } = renderHook(() => useOthello());
+
+    expect(result.current.board).toEqual(savedState.board);
+    expect(result.current.turn).toBe(1);
+    expect(result.current.isStateLoaded).toBe(true);
   });
 
   it('executes user move and triggers AI turn', async () => {
-    (othelloLogic.getFlippedIndices as jest.Mock).mockReturnValue([20]); // Mock flipped stones
+    // Return flips for ANY move (index 20 for user, something else for AI if needed, but simple return works)
+    (othelloLogic.getFlippedIndices as jest.Mock).mockReturnValue([20]);
 
     const { result } = renderHook(() => useOthello());
 
@@ -92,6 +130,9 @@ describe('useOthello Hook', () => {
       if (turn === 0) return false; // User cannot move
       return true; // AI can move (so game not over)
     });
+    // Ensure AI move is valid to avoid console error
+    (othelloLogic.getFlippedIndices as jest.Mock).mockReturnValue([20]);
+
 
     const { result } = renderHook(() => useOthello());
 
@@ -113,5 +154,15 @@ describe('useOthello Hook', () => {
     await waitFor(() => {
       expect(gameApi.fetchNextMove).toHaveBeenCalled();
     });
+  });
+
+  it('resets game and clears storage', () => {
+    const { result } = renderHook(() => useOthello());
+
+    act(() => {
+      result.current.resetGame();
+    });
+
+    expect(localStorageMock.removeItem).toHaveBeenCalledWith('othello_game_state');
   });
 });
