@@ -44,6 +44,9 @@ export const useOthello = () => {
     // Don't allow move if processing or game is over
     if (isProcessing || winner !== null) return;
 
+    // In AI mode, only allow player 0 (human) to move via UI
+    if (gameMode === 'ai' && turn !== 0) return;
+
     const flippedIndices = getFlippedIndices(board, index, turn);
     if (flippedIndices.length === 0) return;
 
@@ -56,7 +59,7 @@ export const useOthello = () => {
     setBoard(newBoard);
 
     // 3. Switch turn: In human mode, switch between 0 and 1; In AI mode, always go to AI (1)
-    const nextTurn: Turn = gameMode === 'human' ? (1 - turn) as Turn : 1;
+    const nextTurn: Turn = gameMode === 'human' ? (1 - turn) : 1;
     setTurn(nextTurn);
 
     // Check game end immediately after move
