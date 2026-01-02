@@ -1,8 +1,8 @@
 # ⚪️⚫️ Othello GUI
 
 **Modern, Fast, and Beautiful.**
-
-[**🚀 Live Demo: nanasezero.com**](https://nanasezero.com/)
+## 🌐 Live Demo
+[**https://nanasezero.com/**](https://nanasezero.com/)
 
 高速なC++思考エンジンとモダンなWeb技術（Next.js + Rails）を組み合わせた、没入感のあるオセロアプリケーションです。
 
