@@ -19,6 +19,8 @@ jest.mock('../../utils/othelloLogic', () => ({
 describe('useOthello Hook', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    // Clear localStorage
+    localStorageMock.clear();
     // Default mock implementations
     (othelloLogic.hasValidMoves as jest.Mock).mockReturnValue(true);
     (othelloLogic.getFlippedIndices as jest.Mock).mockReturnValue([]);
@@ -62,7 +64,7 @@ describe('useOthello Hook', () => {
       turn: 1,
       winner: null
     };
-    localStorageMock.getItem.mockReturnValue(JSON.stringify(savedState));
+    localStorageMock.getItem.mockReturnValueOnce(JSON.stringify(savedState));
 
     const { result } = renderHook(() => useOthello());
 
@@ -164,5 +166,75 @@ describe('useOthello Hook', () => {
     });
 
     expect(localStorageMock.removeItem).toHaveBeenCalledWith('othello_game_state');
+  });
+
+  describe('Human vs Human mode', () => {
+    it('allows both players to move without triggering AI', async () => {
+      (othelloLogic.getFlippedIndices as jest.Mock).mockReturnValue([20]);
+      (othelloLogic.hasValidMoves as jest.Mock).mockReturnValue(true); // Both players can move
+
+      const { result } = renderHook(() => useOthello(0, 'human'));
+
+      // Wait for initial state to be loaded
+      await waitFor(() => {
+        expect(result.current.isStateLoaded).toBe(true);
+      });
+
+      // Initial turn is black (0)
+      expect(result.current.turn).toBe(0);
+
+      // Black makes a move
+      await act(async () => {
+        result.current.executeMove(19);
+      });
+
+      // Board should be updated
+      expect(result.current.board[19]).toBe(0);
+      // Turn should switch to white (1)
+      expect(result.current.turn).toBe(1);
+
+      // Verify AI was NOT called
+      expect(gameApi.fetchNextMove).not.toHaveBeenCalled();
+
+      // White makes a move
+      (othelloLogic.getFlippedIndices as jest.Mock).mockReturnValue([30]);
+      await act(async () => {
+        result.current.executeMove(29);
+      });
+
+      // Board should be updated
+      expect(result.current.board[29]).toBe(1);
+      // Turn should switch back to black (0)
+      expect(result.current.turn).toBe(0);
+
+      // Verify AI still not called
+      expect(gameApi.fetchNextMove).not.toHaveBeenCalled();
+    });
+
+    it('handles pass in human mode correctly', async () => {
+      (othelloLogic.hasValidMoves as jest.Mock).mockImplementation((board, turn) => {
+        if (turn === 0) return false; // Black cannot move
+        return true; // White can move
+      });
+
+      const { result } = renderHook(() => useOthello(0, 'human'));
+
+      // Should trigger pass popup for black
+      await waitFor(() => {
+        expect(result.current.passPopup).toBe('USER');
+      });
+
+      // Acknowledge pass
+      act(() => {
+        result.current.acknowledgePass();
+      });
+
+      // Turn should switch to white (1)
+      expect(result.current.passPopup).toBeNull();
+      expect(result.current.turn).toBe(1);
+
+      // AI should not be called
+      expect(gameApi.fetchNextMove).not.toHaveBeenCalled();
+    });
   });
 });

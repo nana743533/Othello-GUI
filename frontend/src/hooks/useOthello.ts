@@ -5,11 +5,12 @@ import { getFlippedIndices, boardToString, hasValidMoves } from '../utils/othell
 type CellValue = -1 | 0 | 1;
 // 0: Black (First), 1: White
 type Turn = 0 | 1;
+type GameMode = 'ai' | 'human';
 
 // Storage Key
 const STORAGE_KEY = 'othello_game_state';
 
-export const useOthello = (playerColor: Turn = 0) => {
+export const useOthello = (playerColor: Turn = 0, gameMode: GameMode = 'ai') => {
   const aiColor = (playerColor === 0 ? 1 : 0) as Turn;
 
   // Initial Board Setup: center 4 stones
@@ -73,8 +74,9 @@ export const useOthello = (playerColor: Turn = 0) => {
 
   const executeMove = useCallback((index: number) => {
     // 1. Validation & Flipping (Client Side)
-    // Only allow move if it's Player's turn and not processing
-    if (turn !== playerColor || isProcessing || winner !== null) return;
+    // In human mode, allow both players to move; in AI mode, only allow player's turn
+    if (gameMode === 'ai' && turn !== playerColor) return;
+    if (isProcessing || winner !== null) return;
 
     const flippedIndices = getFlippedIndices(board, index, turn);
     if (flippedIndices.length === 0) return;
@@ -87,12 +89,13 @@ export const useOthello = (playerColor: Turn = 0) => {
     });
     setBoard(newBoard);
 
-    const nextTurn = aiColor; // Always AI next after user move
+    // In human mode, switch between players; in AI mode, switch to AI
+    const nextTurn = (turn === 0 ? 1 : 0) as Turn;
     setTurn(nextTurn);
 
     // Check game end immediately after move
     checkGameEnd(newBoard);
-  }, [board, turn, isProcessing, winner, checkGameEnd, playerColor, aiColor]);
+  }, [board, turn, isProcessing, winner, checkGameEnd, playerColor, gameMode]);
 
 
   // AI Turn Logic
@@ -132,50 +135,64 @@ export const useOthello = (playerColor: Turn = 0) => {
     }
   }, [board, checkGameEnd, aiColor, playerColor]);
 
-  // Check for pass conditions (User only, AI pass is handled in runAiTurn)
+  // Check for pass conditions (User only in AI mode, both players in human mode)
   const checkPassCondition = useCallback(() => {
-    // User Turn
-    const userCanMove = hasValidMoves(board, playerColor);
-
-    // If user has no moves, show pass popup
-    if (!userCanMove) {
-      // Double check game isn't over
-      if (!checkGameEnd(board)) {
-        setPassPopup('USER');
+    if (gameMode === 'ai') {
+      // In AI mode, only check user turn
+      if (turn !== playerColor) return;
+      
+      const userCanMove = hasValidMoves(board, playerColor);
+      if (!userCanMove) {
+        if (!checkGameEnd(board)) {
+          setPassPopup('USER');
+        }
+      }
+    } else {
+      // In human mode, check current player
+      const currentPlayerCanMove = hasValidMoves(board, turn);
+      if (!currentPlayerCanMove) {
+        if (!checkGameEnd(board)) {
+          setPassPopup(turn === 0 ? 'USER' : 'AI'); // Reuse 'USER' for player 1, 'AI' for player 2
+        }
       }
     }
-  }, [board, checkGameEnd, playerColor]);
+  }, [board, checkGameEnd, playerColor, turn, gameMode]);
 
   // Effect to trigger AI Turn or Check User Pass
   useEffect(() => {
     if (winner !== null || passPopup) return;
 
-
-    if (turn === aiColor) {
+    if (gameMode === 'ai' && turn === aiColor) {
       // AI Turn
       const timer = setTimeout(() => {
         runAiTurn();
       }, 500);
       return () => clearTimeout(timer);
     } else {
-      // User Turn
+      // User Turn (or human mode)
       checkPassCondition();
     }
-  }, [turn, winner, runAiTurn, checkPassCondition, passPopup, aiColor]);
+  }, [turn, winner, runAiTurn, checkPassCondition, passPopup, aiColor, gameMode]);
 
 
   // Function to acknowledge pass popup
   const acknowledgePass = useCallback(() => {
     if (passPopup === 'AI') {
-      // AI passed, control returned to User (turn is already playerColor set in runAiTurn)
-      // Nothing to do but close popup
+      // AI passed (or Player 2 in human mode), control returned to User/Player 1
       setPassPopup(null);
+      if (gameMode === 'human') {
+        setTurn(0);
+      }
     } else if (passPopup === 'USER') {
-      // User passed. Control goes to AI.
+      // User passed (or Player 1 in human mode). Control goes to AI/Player 2.
       setPassPopup(null);
-      setTurn(aiColor);
+      if (gameMode === 'human') {
+        setTurn(1);
+      } else {
+        setTurn(aiColor);
+      }
     }
-  }, [passPopup, aiColor]);
+  }, [passPopup, aiColor, gameMode]);
 
 
   return {
