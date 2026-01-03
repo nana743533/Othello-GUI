@@ -178,6 +178,8 @@ function GameContent() {
                 className="w-full p-2 rounded-xl bg-neumorphism-base text-neumorphism-text shadow-neumorphism-inset font-bold text-center border-none outline-none focus:ring-2 focus:ring-blue-400/50"
               >
                 <option value="v1">Level 1</option>
+                <option value="v2">Level 2</option>
+                <option value="v3">Level 3</option>
                 {/* Future levels can be added here */}
               </select>
             </div>
