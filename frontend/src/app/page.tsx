@@ -20,17 +20,22 @@ function GameContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const playerParam = searchParams.get('player');
+  const modeParam = searchParams.get('mode') as 'ai' | 'human' | null;
 
   // Validate player param and redirect if invalid
   useEffect(() => {
     if (playerParam !== 'black' && playerParam !== 'white') {
       router.replace('/newgame');
     }
-  }, [playerParam, router]);
+    if (modeParam !== 'ai' && modeParam !== 'human') {
+      router.replace('/newgame');
+    }
+  }, [playerParam, modeParam, router]);
 
   // Determine player color (0: Black, 1: White)
   // If param is invalid/loading, default to 0 to prevent crashes, but effect will redirect.
   const playerColor = playerParam === 'white' ? 1 : 0;
+  const gameMode = modeParam || 'ai';
 
   const [showResult, setShowResult] = useState(false);
 
@@ -44,7 +49,7 @@ function GameContent() {
     executeMove,
     resetGame,
     isStateLoaded
-  } = useOthello(playerColor); // Pass player color
+  } = useOthello(playerColor, gameMode); // Pass game mode
 
   const blackCount = board.filter((c) => c === 0).length;
   const whiteCount = board.filter((c) => c === 1).length;
@@ -57,7 +62,7 @@ function GameContent() {
   // Show result popup when winner is decided
   useEffect(() => {
     if (winner !== null) {
-      // eslint-disable-next-line react-hooks/exhaustive-deps
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setShowResult(true);
     }
   }, [winner]);
@@ -68,11 +73,18 @@ function GameContent() {
 
   if (winner !== null) {
     if (winner === 'Draw') statusDisplay = 'Draw';
-    else if (winner === playerColor) statusDisplay = 'You Win!';
-    else statusDisplay = 'AI Wins!';
+    else if (gameMode === 'human') {
+      statusDisplay = winner === 0 ? 'Black Wins!' : 'White Wins!';
+    } else if (winner === playerColor) {
+      statusDisplay = 'You Win!';
+    } else {
+      statusDisplay = 'AI Wins!';
+    }
   } else {
     // If not game over
-    if (turn === playerColor) {
+    if (gameMode === 'human') {
+      statusDisplay = turn === 0 ? 'Black\'s Turn' : 'White\'s Turn';
+    } else if (turn === playerColor) {
       statusDisplay = 'Your Turn';
     } else {
       // AI Turn
@@ -82,11 +94,14 @@ function GameContent() {
   }
 
   // Dynamic Labels
-  const blackLabel = playerColor === 0 ? 'You' : 'AI';
-  const whiteLabel = playerColor === 1 ? 'You' : 'AI';
+  const blackLabel = gameMode === 'human' ? 'Black' : (playerColor === 0 ? 'You' : 'AI');
+  const whiteLabel = gameMode === 'human' ? 'White' : (playerColor === 1 ? 'You' : 'AI');
 
   // Avoid rendering game while checking param or loading state to prevent flash
   if (playerParam !== 'black' && playerParam !== 'white') {
+    return null;
+  }
+  if (modeParam !== 'ai' && modeParam !== 'human') {
     return null;
   }
 
@@ -160,7 +175,7 @@ function GameContent() {
 
       {/* Pass Check Popup */}
       {passPopup && (
-        <PassPopup passType={passPopup} onAcknowledge={acknowledgePass} />
+        <PassPopup passType={passPopup} onAcknowledge={acknowledgePass} gameMode={gameMode} />
       )}
 
       {/* Result Popup */}
@@ -171,6 +186,7 @@ function GameContent() {
           onRestart={handleNewGame}
           onClose={() => setShowResult(false)}
           playerColor={playerColor}
+          gameMode={gameMode}
         />
       )}
     </div>

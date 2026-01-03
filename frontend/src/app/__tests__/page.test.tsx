@@ -40,6 +40,11 @@ describe('Home Page', () => {
     jest.clearAllMocks();
     (useRouter as jest.Mock).mockReturnValue(mockRouter);
     (useSearchParams as jest.Mock).mockReturnValue(mockSearchParams);
+    mockSearchParams.get.mockImplementation((key: string) => {
+      if (key === 'player') return 'black';
+      if (key === 'mode') return 'ai';
+      return null;
+    });
 
     // Default useOthello mock
     (useOthello as jest.Mock).mockReturnValue({
@@ -63,7 +68,7 @@ describe('Home Page', () => {
   });
 
   it('renders loading state when isStateLoaded is false', () => {
-    mockSearchParams.get.mockReturnValue('black');
+    // Uses default mock (player=black, mode=ai)
     (useOthello as jest.Mock).mockReturnValue({
       board: Array(64).fill(-1),
       turn: 0,
@@ -78,7 +83,7 @@ describe('Home Page', () => {
   });
 
   it('renders game content when loaded and param is valid', () => {
-    mockSearchParams.get.mockReturnValue('black');
+    // Uses default mock (player=black, mode=ai)
 
     render(<Home />);
 
@@ -94,7 +99,11 @@ describe('Home Page', () => {
   });
 
   it('calls resetGame when Reset button is clicked', () => {
-    mockSearchParams.get.mockReturnValue('white');
+    mockSearchParams.get.mockImplementation((key: string) => {
+      if (key === 'player') return 'white';
+      if (key === 'mode') return 'ai';
+      return null;
+    });
     const resetGameMock = jest.fn();
     (useOthello as jest.Mock).mockReturnValue({
       board: Array(64).fill(-1),
@@ -115,7 +124,7 @@ describe('Home Page', () => {
   });
 
   it('shows result popup when winner is set', () => {
-    mockSearchParams.get.mockReturnValue('black');
+    // Uses default mock (player=black, mode=ai)
     (useOthello as jest.Mock).mockReturnValue({
       board: Array(64).fill(0),
       turn: 0,
@@ -130,7 +139,7 @@ describe('Home Page', () => {
   });
 
   it('closes result popup when close button is clicked', async () => {
-    mockSearchParams.get.mockReturnValue('black');
+    // Uses default mock (player=black, mode=ai)
     (useOthello as jest.Mock).mockReturnValue({
       board: Array(64).fill(0),
       turn: 0,
@@ -141,7 +150,7 @@ describe('Home Page', () => {
     });
 
     render(<Home />);
-    const closeBtn = screen.getByText('Close');
+    const closeBtn = await screen.findByText('Close');
     fireEvent.click(closeBtn);
 
     // Wait for state update (it's local state in page)

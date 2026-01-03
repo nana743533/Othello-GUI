@@ -114,6 +114,7 @@ test-backend-rspec:
 	docker compose exec backend bundle exec rspec
 
 test-frontend:
+	docker compose exec frontend npm install
 	docker compose exec frontend npm test
 
 # ============================================================================

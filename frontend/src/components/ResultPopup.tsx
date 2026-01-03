@@ -8,9 +8,11 @@ interface ResultPopupProps {
   board: number[];
   onRestart: () => void;
   onClose: () => void;
+  playerColor?: Turn;
+  gameMode?: 'ai' | 'human';
 }
 
-export const ResultPopup: React.FC<ResultPopupProps & { playerColor?: Turn }> = ({ winner, board, onRestart, onClose, playerColor = 0 }) => {
+export const ResultPopup: React.FC<ResultPopupProps> = ({ winner, board, onRestart, onClose, playerColor = 0, gameMode = 'ai' }) => {
   if (winner === null) return null;
 
   const rawBlackCount = board.filter((c) => c === 0).length;
@@ -29,11 +31,11 @@ export const ResultPopup: React.FC<ResultPopupProps & { playerColor?: Turn }> = 
     finalWhiteCount += split;
   } else if (winner === 0) {
     // Black Wins
-    resultMessage = playerColor === 0 ? 'You Win!' : 'AI Wins!';
+    resultMessage = gameMode === 'human' ? 'Black Wins!' : (playerColor === 0 ? 'You Win!' : 'AI Wins!');
     finalBlackCount += emptyCount;
   } else {
     // White Wins
-    resultMessage = playerColor === 1 ? 'You Win!' : 'AI Wins!';
+    resultMessage = gameMode === 'human' ? 'White Wins!' : (playerColor === 1 ? 'You Win!' : 'AI Wins!');
     finalWhiteCount += emptyCount;
   }
 

@@ -5,10 +5,26 @@ type PassType = 'AI' | 'USER' | null;
 interface PassPopupProps {
   passType: PassType;
   onAcknowledge: () => void;
+  gameMode?: 'ai' | 'human';
 }
 
-export const PassPopup: React.FC<PassPopupProps> = ({ passType, onAcknowledge }) => {
+export const PassPopup: React.FC<PassPopupProps> = ({ passType, onAcknowledge, gameMode = 'ai' }) => {
   if (!passType) return null;
+
+  let message = '';
+  if (gameMode === 'human') {
+    if (passType === 'USER') {
+      message = "Black cannot move. Turn passes to White.";
+    } else {
+      message = "White cannot move. Turn passes to Black.";
+    }
+  } else {
+    if (passType === 'AI') {
+      message = "AI cannot move. Turn passes to you.";
+    } else {
+      message = "You cannot move. Turn passes to AI.";
+    }
+  }
 
   return (
     <div
@@ -21,9 +37,7 @@ export const PassPopup: React.FC<PassPopupProps> = ({ passType, onAcknowledge })
       >
         <h2 className="text-2xl font-bold text-neumorphism-text mb-4 text-center">PASS</h2>
         <p className="text-lg text-neumorphism-text mb-6 text-center">
-          {passType === 'AI'
-            ? "AI cannot move. Turn passes to you."
-            : "You cannot move. Turn passes to AI."}
+          {message}
         </p>
         <button
           onClick={onAcknowledge}
