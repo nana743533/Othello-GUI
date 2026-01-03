@@ -10,10 +10,11 @@ export const gameApi = {
    * @param board 64-character string representing the board.
    * @param turn 0 for Black, 1 for White.
    */
-  fetchNextMove: async (board: string, turn: number): Promise<number> => {
+  fetchNextMove: async (board: string, turn: number, aiLevel: string = 'v1'): Promise<number> => {
     const response = await apiClient.post<NextMoveResponse>('/games/next_move', {
       board,
       turn,
+      aiLevel,
     });
     return response.next_move;
   },

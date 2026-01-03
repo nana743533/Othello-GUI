@@ -41,6 +41,10 @@ paths:
                   type: integer
                   example: 1
                   description: 'Current turn (0: black, 1: white)'
+                aiLevel:
+                  type: string
+                  example: 'v1'
+                  description: 'AI Logic Version (default: v1)'
               required:
               - board
               - turn

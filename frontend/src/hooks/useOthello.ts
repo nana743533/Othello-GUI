@@ -10,7 +10,7 @@ type GameMode = 'ai' | 'human';
 // Storage Key
 const STORAGE_KEY = 'othello_game_state';
 
-export const useOthello = (playerColor: Turn = 0, gameMode: GameMode = 'ai') => {
+export const useOthello = (playerColor: Turn = 0, gameMode: GameMode = 'ai', aiLevel: string = 'v1') => {
   const aiColor = (playerColor === 0 ? 1 : 0) as Turn;
 
   // Initial Board Setup: center 4 stones
@@ -103,7 +103,7 @@ export const useOthello = (playerColor: Turn = 0, gameMode: GameMode = 'ai') => 
     setIsProcessing(true);
     try {
       const boardString = boardToString(board);
-      const aiMoveIndex = await gameApi.fetchNextMove(boardString, aiColor); // Dynamic AI color
+      const aiMoveIndex = await gameApi.fetchNextMove(boardString, aiColor, aiLevel); // Dynamic AI color and level
 
       if (aiMoveIndex === -1) {
         // AI Pass
@@ -133,14 +133,14 @@ export const useOthello = (playerColor: Turn = 0, gameMode: GameMode = 'ai') => 
     } finally {
       setIsProcessing(false);
     }
-  }, [board, checkGameEnd, aiColor, playerColor]);
+  }, [board, checkGameEnd, aiColor, playerColor, aiLevel]);
 
   // Check for pass conditions (User only in AI mode, both players in human mode)
   const checkPassCondition = useCallback(() => {
     if (gameMode === 'ai') {
       // In AI mode, only check user turn
       if (turn !== playerColor) return;
-      
+
       const userCanMove = hasValidMoves(board, playerColor);
       if (!userCanMove) {
         if (!checkGameEnd(board)) {

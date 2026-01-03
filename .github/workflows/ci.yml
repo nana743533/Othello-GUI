@@ -26,8 +26,12 @@ jobs:
           sudo apt-get install -y build-essential libsqlite3-dev libyaml-dev
       - name: Compile Othello AI
         run: |
-          g++ -O3 -o othelloai_logic/othello othelloai_logic/othello.cpp
-          chmod +x othelloai_logic/othello
+          g++ -O3 -o othelloai_logic/v1/othello othelloai_logic/v1/othello.cpp
+          chmod +x othelloai_logic/v1/othello
+          g++ -O3 -o othelloai_logic/v2/othello othelloai_logic/v2/othello.cpp
+          chmod +x othelloai_logic/v2/othello
+          g++ -O3 -o othelloai_logic/v3/othello othelloai_logic/v3/othello.cpp
+          chmod +x othelloai_logic/v3/othello
       - name: Setup Database
         run: bin/rails db:test:prepare
       - name: Run Tests

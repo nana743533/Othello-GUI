@@ -21,6 +21,7 @@ function GameContent() {
   const searchParams = useSearchParams();
   const playerParam = searchParams.get('player');
   const modeParam = searchParams.get('mode') as 'ai' | 'human' | null;
+  const aiLevelParam = searchParams.get('aiLevel') || 'v1';
 
   // Validate player param and redirect if invalid
   useEffect(() => {
@@ -49,7 +50,7 @@ function GameContent() {
     executeMove,
     resetGame,
     isStateLoaded
-  } = useOthello(playerColor, gameMode); // Pass game mode
+  } = useOthello(playerColor, gameMode, aiLevelParam); // Pass game mode and AI level
 
   const blackCount = board.filter((c) => c === 0).length;
   const whiteCount = board.filter((c) => c === 1).length;
@@ -161,6 +162,28 @@ function GameContent() {
           >
             New Game
           </button>
+
+          {/* AI Level Selector */}
+          {gameMode === 'ai' && (
+            <div className="w-full mt-2">
+              <label className="block text-sm font-bold text-neumorphism-text mb-2 text-center">AI Level</label>
+              <select
+                value={aiLevelParam}
+                onChange={(e) => {
+                  const newLevel = e.target.value;
+                  const params = new URLSearchParams(searchParams.toString());
+                  params.set('aiLevel', newLevel);
+                  router.replace(`/?${params.toString()}`);
+                }}
+                className="w-full p-2 rounded-xl bg-neumorphism-base text-neumorphism-text shadow-neumorphism-inset font-bold text-center border-none outline-none focus:ring-2 focus:ring-blue-400/50"
+              >
+                <option value="v1">Level 1</option>
+                <option value="v2">Level 2</option>
+                <option value="v3">Level 3</option>
+                {/* Future levels can be added here */}
+              </select>
+            </div>
+          )}
         </div>
       </div>
 

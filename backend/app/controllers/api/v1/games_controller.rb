@@ -7,6 +7,7 @@ module Api
       def next_move
         board_str = params[:board]
         turn = params[:turn]
+        ai_level = params[:aiLevel] || 'v1' # Default to v1
 
         # Validation
         if board_str.nil? || board_str.length != 64 || turn.nil?
@@ -15,11 +16,17 @@ module Api
         end
 
         # Path to C++ executable
-        # Assuming directory structure: backend/othelloai_logic/othello
-        exe_path = Rails.root.join('othelloai_logic', 'othello').to_s
+        # Directory structure: backend/othelloai_logic/<version>/othello
+        # Sanitize ai_level to prevent directory traversal
+        unless ai_level.match?(/^[a-zA-Z0-9_]+$/)
+           render json: { error: 'Invalid AI level format' }, status: :unprocessable_entity
+           return
+        end
+
+        exe_path = Rails.root.join('othelloai_logic', ai_level, 'othello').to_s
 
         unless File.exist?(exe_path)
-          render json: { error: 'AI executable not found' }, status: :internal_server_error
+          render json: { error: "AI executable not found for level: #{ai_level}" }, status: :internal_server_error
           return
         end
 

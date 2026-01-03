@@ -43,6 +43,7 @@ describe('Home Page', () => {
     mockSearchParams.get.mockImplementation((key: string) => {
       if (key === 'player') return 'black';
       if (key === 'mode') return 'ai';
+      if (key === 'aiLevel') return 'v1';
       return null;
     });
 
@@ -102,6 +103,7 @@ describe('Home Page', () => {
     mockSearchParams.get.mockImplementation((key: string) => {
       if (key === 'player') return 'white';
       if (key === 'mode') return 'ai';
+      if (key === 'aiLevel') return 'v1';
       return null;
     });
     const resetGameMock = jest.fn();

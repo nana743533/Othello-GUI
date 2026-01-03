@@ -85,7 +85,7 @@ module Api
 
       test "should return error when C++ executable is missing" do
         # Temporarily rename executable to simulate missing file
-        exe_path = Rails.root.join('othelloai_logic', 'othello')
+        exe_path = Rails.root.join('othelloai_logic', 'v1', 'othello')
         File.rename(exe_path, exe_path.to_s + ".bak") if File.exist?(exe_path)
 
         begin

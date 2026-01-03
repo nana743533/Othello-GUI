@@ -95,7 +95,7 @@ install-frontend:
 setup: install compile-cpp
 
 compile-cpp:
-	cd backend/othelloai_logic && g++ -O3 -o othello othello.cpp
+	cd backend/othelloai_logic/$(or $(VERSION),v1) && g++ -O3 -o othello othello.cpp
 
 # ============================================================================
 # Testing Commands
