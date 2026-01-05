@@ -7,8 +7,10 @@ WORKDIR /app/backend
 # Copy source code for compilation
 COPY . .
 
-# Compile C++ binary
-RUN g++ -O3 -o othelloai_logic/othello othelloai_logic/othello.cpp
+# Compile C++ binary for each version
+RUN cd othelloai_logic/v1 && g++ -O3 -o othello othello.cpp
+RUN cd othelloai_logic/v2 && g++ -O3 -o othello othello.cpp
+RUN cd othelloai_logic/v3 && g++ -O3 -o othello othello.cpp
 
 # Stage 2: Runner
 FROM ruby:3.2-slim
@@ -34,8 +36,9 @@ RUN bundle install
 COPY . .
 
 # Copy compiled binary from builder (For production usage)
-# In development with volumes, this might be shadowed, but the entrypoint handles recompilation.
-COPY --from=builder /app/backend/othelloai_logic/othello ./othelloai_logic/othello
+COPY --from=builder /app/backend/othelloai_logic/v1/othello ./othelloai_logic/v1/othello
+COPY --from=builder /app/backend/othelloai_logic/v2/othello ./othelloai_logic/v2/othello
+COPY --from=builder /app/backend/othelloai_logic/v3/othello ./othelloai_logic/v3/othello
 
 # Entrypoint script
 COPY bin/docker-entrypoint.sh /usr/bin/
