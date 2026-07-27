@@ -107,7 +107,7 @@ export PROJECT_NUMBER="$(gcloud projects describe "$PROJECT_ID" --format='value(
 export SA_EMAIL="github-cloudrun-deploy@${PROJECT_ID}.iam.gserviceaccount.com"
 export POOL_ID="github-actions"
 export PROVIDER_ID="github-oidc"
-export REPO="nana743533/Othello_GUI"
+export REPO="nana743533/Othello-GUI"
 
 gcloud services enable iamcredentials.googleapis.com
 
