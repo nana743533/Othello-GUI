@@ -45,5 +45,6 @@ COPY bin/docker-entrypoint.sh /usr/bin/
 RUN chmod +x /usr/bin/docker-entrypoint.sh
 ENTRYPOINT ["docker-entrypoint.sh"]
 
-EXPOSE 3001
+# Cloud Run injects PORT (default 8080); Puma reads it via config/puma.rb
+EXPOSE 8080
 CMD ["rails", "server", "-b", "0.0.0.0"]
