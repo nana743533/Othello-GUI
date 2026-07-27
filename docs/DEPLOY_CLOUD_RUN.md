@@ -32,16 +32,18 @@ gcloud artifacts repositories create othello \
   --description="Othello backend images"
 ```
 
-### RAILS_MASTER_KEY を Secret Manager に登録
+### SECRET_KEY_BASE を Secret Manager に登録
+
+Railway など既存環境の `SECRET_KEY_BASE` を流用します（`master.key` は不要）。
 
 ```bash
-# backend/config/master.key の内容を Secret に保存
-gcloud secrets create RAILS_MASTER_KEY \
+# 値は画面に残さないよう、変数経由で渡すのが安全
+echo -n "$SECRET_KEY_BASE" | gcloud secrets create SECRET_KEY_BASE \
+  --data-file=- \
   --replication-policy="automatic"
-
-gcloud secrets versions add RAILS_MASTER_KEY \
-  --data-file=backend/config/master.key
 ```
+
+すでに Secret がある場合は `gcloud secrets versions add SECRET_KEY_BASE --data-file=-` で更新します。
 
 ## 2. 手動デプロイ（初回確認用）
 
@@ -64,8 +66,8 @@ gcloud run deploy "${SERVICE}" \
   --allow-unauthenticated \
   --port=8080 \
   --memory=512Mi \
-  --set-env-vars="RAILS_ENV=production,RAILS_LOG_LEVEL=info" \
-  --set-secrets="RAILS_MASTER_KEY=RAILS_MASTER_KEY:latest"
+  --set-env-vars="RAILS_ENV=production,RAILS_LOG_LEVEL=info,RAILS_LOG_TO_STDOUT=true" \
+  --set-secrets="SECRET_KEY_BASE=SECRET_KEY_BASE:latest"
 ```
 
 デプロイ後、表示される URL（例: `https://othello-backend-xxxxx-an.a.run.app`）を控えてください。
