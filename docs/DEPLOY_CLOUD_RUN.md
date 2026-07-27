@@ -89,24 +89,30 @@ curl -X POST "${BACKEND_URL}/api/v1/games/next_move" \
 ## 3. GitHub Actions による自動デプロイ
 
 `.github/workflows/deploy-backend-cloudrun.yml` が `main` ブランチへの `backend/**` 変更時にデプロイします。
+組織ポリシーでサービスアカウントキー作成が禁止されているため、**Workload Identity Federation（鍵なし）** を使います。
 
 ### 必要な GitHub Secrets
 
 | Secret | 説明 |
 |--------|------|
-| `GCP_PROJECT_ID` | GCP プロジェクト ID |
-| `GCP_SA_KEY` | デプロイ用サービスアカウントの JSON キー |
+| `GCP_PROJECT_ID` | GCP プロジェクト ID（例: `othello-gui`） |
+| `GCP_WORKLOAD_IDENTITY_PROVIDER` | WIF プロバイダのフルパス |
+| `GCP_SERVICE_ACCOUNT` | デプロイ用 SA のメール |
 
-### サービスアカウントの作成例
+### セットアップ例（othello-gui）
 
 ```bash
-export PROJECT_ID="your-gcp-project-id"
-export SA_NAME="github-cloudrun-deploy"
+export PROJECT_ID="othello-gui"
+export PROJECT_NUMBER="$(gcloud projects describe "$PROJECT_ID" --format='value(projectNumber)')"
+export SA_EMAIL="github-cloudrun-deploy@${PROJECT_ID}.iam.gserviceaccount.com"
+export POOL_ID="github-actions"
+export PROVIDER_ID="github-oidc"
+export REPO="nana743533/Othello_GUI"
 
-gcloud iam service-accounts create "${SA_NAME}" \
+gcloud services enable iamcredentials.googleapis.com
+
+gcloud iam service-accounts create github-cloudrun-deploy \
   --display-name="GitHub Actions Cloud Run Deploy"
-
-export SA_EMAIL="${SA_NAME}@${PROJECT_ID}.iam.gserviceaccount.com"
 
 for ROLE in \
   roles/run.admin \
@@ -118,11 +124,32 @@ for ROLE in \
     --role="${ROLE}"
 done
 
-gcloud iam service-accounts keys create sa-key.json \
-  --iam-account="${SA_EMAIL}"
+gcloud iam workload-identity-pools create "${POOL_ID}" \
+  --location="global" \
+  --display-name="GitHub Actions"
+
+gcloud iam workload-identity-pools providers create-oidc "${PROVIDER_ID}" \
+  --location="global" \
+  --workload-identity-pool="${POOL_ID}" \
+  --display-name="GitHub OIDC" \
+  --issuer-uri="https://token.actions.githubusercontent.com" \
+  --attribute-mapping="google.subject=assertion.sub,attribute.actor=assertion.actor,attribute.repository=assertion.repository,attribute.repository_owner=assertion.repository_owner" \
+  --attribute-condition="assertion.repository_owner == 'nana743533'"
+
+gcloud iam service-accounts add-iam-policy-binding "${SA_EMAIL}" \
+  --role="roles/iam.workloadIdentityUser" \
+  --member="principalSet://iam.googleapis.com/projects/${PROJECT_NUMBER}/locations/global/workloadIdentityPools/${POOL_ID}/attribute.repository/${REPO}"
 ```
 
-`sa-key.json` の内容を GitHub Secret `GCP_SA_KEY` に登録してください。
+GitHub Secrets の例:
+
+```text
+GCP_PROJECT_ID=othello-gui
+GCP_SERVICE_ACCOUNT=github-cloudrun-deploy@othello-gui.iam.gserviceaccount.com
+GCP_WORKLOAD_IDENTITY_PROVIDER=projects/PROJECT_NUMBER/locations/global/workloadIdentityPools/github-actions/providers/github-oidc
+```
+
+手動実行は Actions → Deploy Backend to Cloud Run → Run workflow から可能です。
 
 ## 4. フロントエンドの更新
 
