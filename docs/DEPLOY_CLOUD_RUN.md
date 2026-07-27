@@ -53,9 +53,9 @@ export REGION="asia-northeast1"
 export SERVICE="othello-backend"
 export IMAGE="${REGION}-docker.pkg.dev/${PROJECT_ID}/othello/${SERVICE}:latest"
 
-# ビルド & プッシュ
+# ビルド & プッシュ（Cloud Run は linux/amd64。Apple Silicon では --platform 必須）
 gcloud auth configure-docker ${REGION}-docker.pkg.dev
-docker build -t "${IMAGE}" ./backend
+docker build --platform linux/amd64 -t "${IMAGE}" ./backend
 docker push "${IMAGE}"
 
 # Cloud Run にデプロイ
