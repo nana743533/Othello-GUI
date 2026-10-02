@@ -1,4 +1,5 @@
 import React from 'react';
+import { OTHELLO_COLORS } from './othello/OthelloBoard';
 
 type Turn = 0 | 1;
 type Winner = Turn | 'Draw' | null;
@@ -53,14 +54,14 @@ export const ResultPopup: React.FC<ResultPopupProps> = ({ winner, board, onResta
 
         <div className="flex items-center gap-8 text-neumorphism-text">
           <div className="flex flex-col items-center gap-3">
-            <div className="w-16 h-16 rounded-full bg-gray-900 shadow-lg border-2 border-gray-700"></div>
+            <div className="w-16 h-16 rounded-full shadow-lg" style={{ background: OTHELLO_COLORS.black }}></div>
             <span className="text-5xl font-bold">{finalBlackCount}</span>
           </div>
 
           <div className="text-5xl font-light text-gray-400 opacity-50 px-2">-</div>
 
           <div className="flex flex-col items-center gap-3">
-            <div className="w-16 h-16 rounded-full bg-gray-100 shadow-lg border-2 border-white"></div>
+            <div className="w-16 h-16 rounded-full shadow-lg" style={{ background: OTHELLO_COLORS.white }}></div>
             <span className="text-5xl font-bold">{finalWhiteCount}</span>
           </div>
         </div>

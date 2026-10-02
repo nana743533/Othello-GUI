@@ -3,6 +3,8 @@
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 
+import { OTHELLO_COLORS } from '@/components/othello/OthelloBoard';
+
 export default function NewGamePage() {
   const router = useRouter();
   const [gameMode, setGameMode] = useState<'ai' | 'human' | null>(null);
@@ -93,7 +95,7 @@ export default function NewGamePage() {
             onClick={() => handleSelectColor('black')}
             className="group flex flex-col items-center gap-6 p-8 rounded-3xl bg-neumorphism-base shadow-neumorphism-flat hover:shadow-neumorphism-pressed active:translate-y-1 transition-all duration-300"
           >
-            <div className="w-24 h-24 md:w-32 md:h-32 rounded-full bg-gray-800 border-4 border-gray-700 shadow-lg group-hover:scale-105 transition-transform duration-300"></div>
+            <div className="w-24 h-24 md:w-32 md:h-32 rounded-full shadow-lg group-hover:scale-105 transition-transform duration-300" style={{ background: OTHELLO_COLORS.black }}></div>
             <span className="text-xl md:text-2xl font-bold text-neumorphism-text">Black</span>
             <span className="text-sm text-gray-500">First Move</span>
           </button>
@@ -103,7 +105,7 @@ export default function NewGamePage() {
             onClick={() => handleSelectColor('white')}
             className="group flex flex-col items-center gap-6 p-8 rounded-3xl bg-neumorphism-base shadow-neumorphism-flat hover:shadow-neumorphism-pressed active:translate-y-1 transition-all duration-300"
           >
-            <div className="w-24 h-24 md:w-32 md:h-32 rounded-full bg-gray-100 border-4 border-white shadow-lg group-hover:scale-105 transition-transform duration-300"></div>
+            <div className="w-24 h-24 md:w-32 md:h-32 rounded-full shadow-lg group-hover:scale-105 transition-transform duration-300" style={{ background: OTHELLO_COLORS.white }}></div>
             <span className="text-xl md:text-2xl font-bold text-neumorphism-text">White</span>
             <span className="text-sm text-gray-500">Second Move</span>
           </button>
