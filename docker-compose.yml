@@ -23,7 +23,7 @@ services:
       - /app/frontend/node_modules
     environment:
       - WATCHPACK_POLLING=true
-      - NEXT_PUBLIC_API_URL=http://localhost:3001/api/v1
+      - BACKEND_URL=http://backend:3001
     depends_on:
       - backend
     tty: true

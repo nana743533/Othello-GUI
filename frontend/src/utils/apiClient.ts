@@ -1,7 +1,8 @@
 /**
  * Base configuration for API requests.
+ * Same origin: next.config.ts rewrites /api/v1/* to the backend (Cloud Run).
  */
-const BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api/v1';
+const BASE_URL = '/api/v1';
 
 /**
  * Custom error class for API errors.
