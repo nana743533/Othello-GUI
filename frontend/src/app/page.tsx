@@ -4,6 +4,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, Suspense, useState } from 'react';
 
 import { Board } from '@/components/Board';
+import { OTHELLO_COLORS } from '@/components/othello/OthelloBoard';
 import { PassPopup } from '@/components/PassPopup';
 import { ResultPopup } from '@/components/ResultPopup';
 import { useOthello } from '@/hooks/useOthello';
@@ -124,7 +125,7 @@ function GameContent() {
         <div className="flex flex-row items-center justify-center gap-8 p-5 rounded-2xl bg-neumorphism-base shadow-neumorphism-flat">
           {/* Black Score */}
           <div className="flex flex-col items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-gray-800 border-2 border-gray-700 shadow-md"></div>
+            <div className="w-10 h-10 rounded-full shadow-md" style={{ background: OTHELLO_COLORS.black }}></div>
             <span className="text-3xl font-bold text-neumorphism-text">{blackCount}</span>
             <span className="text-lg font-bold text-neumorphism-text mt-1">{blackLabel}</span>
           </div>
@@ -133,7 +134,7 @@ function GameContent() {
 
           {/* White Score */}
           <div className="flex flex-col items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-gray-100 border-2 border-white shadow-md"></div>
+            <div className="w-10 h-10 rounded-full shadow-md" style={{ background: OTHELLO_COLORS.white }}></div>
             <span className="text-3xl font-bold text-neumorphism-text">{whiteCount}</span>
             <span className="text-lg font-bold text-neumorphism-text mt-1">{whiteLabel}</span>
           </div>
