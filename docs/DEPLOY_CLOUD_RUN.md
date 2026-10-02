@@ -6,7 +6,7 @@ Railway から Google Cloud Run へバックエンド API を移行するため�
 
 - Google Cloud プロジェクトが作成済みであること
 - 課金（Billing）が有効であること
-- フロントエンド（例: Vercel）側で `NEXT_PUBLIC_API_URL` を Cloud Run の URL に更新できること
+- フロントエンドは Vercel（nanasezero.com）。main に入ると本番に自動デプロイされる
 
 ## 1. GCP の初期設定
 
@@ -151,15 +151,14 @@ GCP_WORKLOAD_IDENTITY_PROVIDER=projects/PROJECT_NUMBER/locations/global/workload
 
 手動実行は Actions → Deploy Backend to Cloud Run → Run workflow から可能です。
 
-## 4. フロントエンドの更新
+## 4. フロントエンドからのつなぎ方
 
-Cloud Run の URL が確定したら、フロントエンドの環境変数を更新します。
+ブラウザは同じドメインの `/api/v1/*`（例: `https://nanasezero.com/api/v1/games/next_move`）を呼び、
+`frontend/next.config.ts` の rewrites が Cloud Run に中継します。Vercel 側の環境変数の設定は不要です。
 
-```
-NEXT_PUBLIC_API_URL=https://othello-backend-xxxxx-an.a.run.app/api/v1
-```
-
-Vercel などホスティング側で設定後、フロントエンドを再デプロイしてください。
+- 中継先は `BACKEND_URL`（未設定なら本番の Cloud Run の URL）
+- Cloud Run のサービスを作り直して URL が変わったときは、`next.config.ts` の既定値を直すか、Vercel に `BACKEND_URL` を設定して再デプロイする
+- ローカルでバックエンドも動かすときは `BACKEND_URL=http://localhost:3001 npm run dev`
 
 ## 補足
 
